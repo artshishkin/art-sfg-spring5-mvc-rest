@@ -1,0 +1,60 @@
+{
+  "meta": {
+    "count": 104,
+    "limit": 10,
+    "page": 1,
+    "next_url": "/shop/customers/?page=2&limit=10"
+  },
+  "customers": [
+    {
+      "firstname": "Alice",
+      "lastname": "Eastman",
+      "customer_url": "/shop/customers/342"
+    },
+    {
+      "firstname": "Sam",
+      "lastname": "Axe",
+      "customer_url": "/shop/customers/344"
+    },
+    {
+      "firstname": "Sam 2",
+      "lastname": "Axe 2",
+      "customer_url": "/shop/customers/345"
+    },
+    {
+      "firstname": "Micheal 2",
+      "lastname": "Weston 2",
+      "customer_url": "/shop/customers/346"
+    },
+    {
+      "firstname": "Joe",
+      "lastname": "Buck",
+      "customer_url": "/shop/customers/347"
+    },
+    {
+      "firstname": "Freddy",
+      "lastname": "Meyers",
+      "customer_url": "/shop/customers/348"
+    },
+    {
+      "firstname": "Tarik",
+      "lastname": "Demirovic",
+      "customer_url": "/shop/customers/349"
+    },
+    {
+      "firstname": "Tarik",
+      "lastname": "Demirovic",
+      "customer_url": "/shop/customers/350"
+    },
+    {
+      "firstname": "TarikUpdate",
+      "lastname": "DemirovicUpdate",
+      "customer_url": "/shop/customers/351"
+    },
+    {
+      "firstname": "TarikUpdate",
+      "lastname": "DemirovicUpdate",
+      "customer_url": "/shop/customers/352"
+    }
+  ]
+}
