@@ -2,3 +2,5 @@
 [![codecov](https://codecov.io/gh/artshishkin/art-sfg-spring5-mvc-rest/branch/master/graph/badge.svg)](https://codecov.io/gh/artshishkin/art-sfg-spring5-mvc-rest)
 # art-sfg-spring5-mvc-rest
 SFG Tutorial Spring 5 - Section 24 Restful WebServices with Spring MVC
+
+### We are cloning `https://api.predic8.de/shop/docs#!/ `
