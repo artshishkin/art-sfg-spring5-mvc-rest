@@ -4,12 +4,10 @@ import com.artarkatesoft.artsfgspring5mvcrest.api.v1.mapper.CustomerMapper;
 import com.artarkatesoft.artsfgspring5mvcrest.api.v1.model.CustomerDTO;
 import com.artarkatesoft.artsfgspring5mvcrest.domain.Customer;
 import com.artarkatesoft.artsfgspring5mvcrest.repositories.CustomerRepository;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;
-import org.mapstruct.factory.Mappers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -18,7 +16,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
@@ -45,6 +43,7 @@ class CustomerServiceImplTest {
         List<CustomerDTO> allCustomersDTO = customerService.getAllCustomers();
         //then
         assertThat(allCustomersDTO).hasSize(3);
+        then(customerRepository).should().findAll();
     }
 
     @Test
@@ -57,7 +56,11 @@ class CustomerServiceImplTest {
         CustomerDTO customerDTO = customerService.getCustomerById(id);
         //then
         then(customerRepository).should().findById(eq(id));
-        assertThat(customerDTO).isEqualToComparingFieldByField(customer);
+        assertThat(customerDTO).isEqualToIgnoringGivenFields(customer,
+                "customerUrl");
+        assertThat(customerDTO.getCustomerUrl())
+                .isNotEmpty()
+                .endsWith(String.valueOf(id));
     }
 
     @Test

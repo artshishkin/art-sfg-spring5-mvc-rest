@@ -4,6 +4,7 @@ import com.artarkatesoft.artsfgspring5mvcrest.api.v1.model.CustomerDTO;
 import com.artarkatesoft.artsfgspring5mvcrest.api.v1.model.CustomerListDTO;
 import com.artarkatesoft.artsfgspring5mvcrest.services.CustomerService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,8 +24,8 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
-import static org.springframework.http.MediaType.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(CustomerController.class)
@@ -60,7 +61,7 @@ class CustomerControllerTest {
     }
 
     private CustomerDTO createFakeCustomer(Long id) {
-        return new CustomerDTO(id, "First" + id, "Last" + id);
+        return new CustomerDTO("First" + id, "Last" + id, "/api/v1/customers/" + id);
     }
 
     private List<CustomerDTO> getFakeCustomers(int size) {
@@ -87,6 +88,7 @@ class CustomerControllerTest {
                 .andExpect(content().contentType(APPLICATION_JSON))
                 .andExpect(content().json(jsonContent))
                 .andExpect(jsonPath("$.customers", hasSize(size)))
+                .andExpect(jsonPath("$.customers[1].customer_url", CoreMatchers.notNullValue()))
                 .andExpect(jsonPath("$.customers[0].firstname", equalTo(defaultCustomers.get(0).getFirstName())));
         //then
         then(customerService).should().getAllCustomers();
@@ -94,7 +96,12 @@ class CustomerControllerTest {
 
     private CustomerListDTO getExampleCustomers() throws IOException {
 //        ClassPathResource resource = new ClassPathResource("/examples/customers.json");
-        return objectMapper.readValue(resource.getFile(), CustomerListDTO.class);
+        CustomerListDTO exampleCustomerListDTO = objectMapper.readValue(resource.getFile(), CustomerListDTO.class);
+        exampleCustomerListDTO
+                .getCustomers()
+                .forEach(dto ->
+                        dto.setCustomerUrl(dto.getCustomerUrl().replace("shop","api/v1")));
+        return exampleCustomerListDTO;
     }
 
 
@@ -111,9 +118,9 @@ class CustomerControllerTest {
         mockMvc.perform(get("/api/v1/customers/{id}", id).accept(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(APPLICATION_JSON))
-//                .andExpect(jsonPath("$.id", equalTo(id)))
                 .andExpect(jsonPath("$.firstname", equalTo(firstName)))
-                .andExpect(jsonPath("$.lastname", equalTo(lastName)));
+                .andExpect(jsonPath("$.lastname", equalTo(lastName)))
+                .andExpect(jsonPath("$.customer_url", equalTo("/api/v1/customers/" + id)));
         //then
         then(customerService).should().getCustomerById(eq(id));
     }

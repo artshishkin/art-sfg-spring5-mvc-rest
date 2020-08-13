@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 class CustomerMapperTest {
 
@@ -30,25 +30,29 @@ class CustomerMapperTest {
         CustomerDTO customerDTO = customerMapper.customerToCustomerDTO(customer);
         //then
         assertAll(
-                () -> assertThat(customerDTO.getId()).isEqualTo(ID),
                 () -> assertThat(customerDTO.getFirstName()).isEqualTo(FIRST_NAME),
                 () -> assertThat(customerDTO.getLastName()).isEqualTo(LAST_NAME),
-                () -> assertThat(customerDTO).isEqualToComparingFieldByField(customer)
+                () -> assertThat(customerDTO.getCustomerUrl()).isNull(),
+                () -> assertThat(customerDTO)
+                        .isEqualToComparingOnlyGivenFields(customer,
+                                "lastName", "firstName")
         );
     }
 
     @Test
     void customerDTOToCustomer() {
         //given
-        CustomerDTO customerDTO = new CustomerDTO(ID, FIRST_NAME, LAST_NAME);
+        CustomerDTO customerDTO = new CustomerDTO(FIRST_NAME, LAST_NAME, null);
         //when
         Customer customer = customerMapper.customerDTOToCustomer(customerDTO);
         //then
         assertAll(
-                () -> assertThat(customer.getId()).isEqualTo(ID),
+                () -> assertThat(customer.getId()).isNull(),
                 () -> assertThat(customer.getFirstName()).isEqualTo(FIRST_NAME),
                 () -> assertThat(customer.getLastName()).isEqualTo(LAST_NAME),
-                () -> assertThat(customer).isEqualToComparingFieldByField(customerDTO)
+                () -> assertThat(customer)
+                        .isEqualToComparingOnlyGivenFields(customerDTO,
+                                "lastName", "firstName")
         );
     }
 }
