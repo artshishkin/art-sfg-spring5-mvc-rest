@@ -5,6 +5,7 @@ import com.artarkatesoft.artsfgspring5mvcrest.api.v1.model.CustomerDTO;
 import com.artarkatesoft.artsfgspring5mvcrest.domain.Customer;
 import com.artarkatesoft.artsfgspring5mvcrest.repositories.CustomerRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;
@@ -14,6 +15,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.LongStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -45,6 +48,26 @@ class CustomerServiceImplTest {
         assertThat(allCustomersDTO).hasSize(3);
         then(customerRepository).should().findAll();
     }
+
+    @Test
+    @DisplayName("When get all customers, every customer should have `customer_url`")
+    void getAllCustomers_testCustomerUrl() {
+        //given
+        List<Customer> allCustomers = LongStream
+                .rangeClosed(1, 3)
+                .mapToObj(id -> new Customer(id, "First" + id, "Second" + id))
+                .collect(Collectors.toList());
+        given(customerRepository.findAll()).willReturn(allCustomers);
+        //when
+        List<CustomerDTO> allCustomersDTO = customerService.getAllCustomers();
+        //then
+        assertThat(allCustomersDTO).hasSize(3).allSatisfy(dto -> assertAll(
+                () -> assertThat(dto).hasNoNullFieldsOrProperties(),
+                () -> assertThat(dto.getCustomerUrl()).contains("/api/v1/customers/")
+        ));
+        then(customerRepository).should().findAll();
+    }
+
 
     @Test
     void getCustomerById_whenFound() {
