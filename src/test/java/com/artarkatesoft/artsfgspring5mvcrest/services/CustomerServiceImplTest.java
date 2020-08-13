@@ -16,9 +16,9 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
@@ -77,5 +77,31 @@ class CustomerServiceImplTest {
         //then
         assertThrows(RuntimeException.class, executable);
         then(customerRepository).should().findById(eq(id));
+    }
+
+    @Test
+    void testCreateNewCustomer() {
+        //given
+        Long id = 123L;
+        String firstName = "First";
+        String lastName = "Last";
+        CustomerDTO dtoToSave = new CustomerDTO(firstName, lastName, null);
+        given(customerRepository.save(any(Customer.class)))
+                .willAnswer(answer -> {
+                    Customer customer = answer.getArgument(0, Customer.class);
+                    customer.setId(id);
+                    return customer;
+                });
+
+        //when
+        CustomerDTO savedDto = customerService.createNewCustomer(dtoToSave);
+
+        //then
+        then(customerRepository).should().save(any(Customer.class));
+        assertAll(
+                () -> assertThat(savedDto).isEqualToIgnoringNullFields(dtoToSave),
+                () -> assertThat(savedDto.getCustomerUrl())
+                        .isEqualTo("/api/v1/customers/" + id)
+        );
     }
 }

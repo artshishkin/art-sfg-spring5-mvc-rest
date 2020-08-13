@@ -4,12 +4,11 @@ import com.artarkatesoft.artsfgspring5mvcrest.api.v1.model.CustomerDTO;
 import com.artarkatesoft.artsfgspring5mvcrest.api.v1.model.CustomerListDTO;
 import com.artarkatesoft.artsfgspring5mvcrest.services.CustomerService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.List;
+import java.net.URI;
 
 @RestController
 @RequiredArgsConstructor
@@ -26,5 +25,15 @@ public class CustomerController {
     @GetMapping("{id}")
     public CustomerDTO getCustomerById(@PathVariable Long id) {
         return customerService.getCustomerById(id);
+    }
+
+    @PostMapping
+    public ResponseEntity<CustomerDTO> createNewCustomer(@RequestBody CustomerDTO customerDTO,
+                                                         UriComponentsBuilder uriBuilder) {
+        CustomerDTO newCustomer = customerService.createNewCustomer(customerDTO);
+        String customerUrl = newCustomer.getCustomerUrl();
+        URI locationUri = uriBuilder.path(customerUrl).build().toUri();
+//        URI locationUri = uriBuilder.build().toUri();
+        return ResponseEntity.created(locationUri).body(newCustomer);
     }
 }

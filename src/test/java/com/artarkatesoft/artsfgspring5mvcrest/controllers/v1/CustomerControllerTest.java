@@ -5,13 +5,18 @@ import com.artarkatesoft.artsfgspring5mvcrest.api.v1.model.CustomerListDTO;
 import com.artarkatesoft.artsfgspring5mvcrest.services.CustomerService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.CoreMatchers;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultMatcher;
 
 import java.io.IOException;
 import java.util.List;
@@ -20,12 +25,12 @@ import java.util.stream.LongStream;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(CustomerController.class)
@@ -100,7 +105,7 @@ class CustomerControllerTest {
         exampleCustomerListDTO
                 .getCustomers()
                 .forEach(dto ->
-                        dto.setCustomerUrl(dto.getCustomerUrl().replace("shop","api/v1")));
+                        dto.setCustomerUrl(dto.getCustomerUrl().replace("shop", "api/v1")));
         return exampleCustomerListDTO;
     }
 
@@ -124,4 +129,33 @@ class CustomerControllerTest {
         //then
         then(customerService).should().getCustomerById(eq(id));
     }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"/api/v1/customers", "/api/v1/customers/"})
+    void createNewCustomer(String urlToPostTo) throws Exception {
+        //given
+        CustomerDTO dtoToSave = new CustomerDTO("first", "last", null);
+        CustomerDTO savedDto = new CustomerDTO("first", "last", "/api/v1/customers/123");
+        String dtoString = objectMapper.writeValueAsString(dtoToSave);
+        given(customerService.createNewCustomer(any(CustomerDTO.class))).willReturn(savedDto);
+        //when
+        mockMvc
+                .perform(
+                        post(urlToPostTo)
+                                .accept(APPLICATION_JSON)
+                                .contentType(APPLICATION_JSON)
+                                .content(dtoString))
+                .andExpect(ResultMatcher.matchAll(
+                        status().isCreated(),
+                        content().contentType(APPLICATION_JSON),
+                        header().string(HttpHeaders.LOCATION, Matchers.equalTo("http://localhost/api/v1/customers/123"))
+
+                ))
+                .andExpect(jsonPath("$.firstname", equalTo("first")))
+                .andExpect(jsonPath("$.lastname", equalTo("last")))
+                .andExpect(jsonPath("$.customer_url", equalTo("/api/v1/customers/123")));
+        //then
+        then(customerService).should().createNewCustomer(eq(dtoToSave));
+    }
+
 }
