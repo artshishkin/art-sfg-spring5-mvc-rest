@@ -11,6 +11,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
+import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -186,4 +187,74 @@ class CustomerControllerTest {
         CustomerDTO customerDTOToSave = customerDTOCaptor.getValue();
         assertThat(customerDTOToSave).isEqualToIgnoringGivenFields(customerDTO, "customerUrl");
     }
+
+    @Test
+    void patchCustomer() throws Exception {
+        //given
+        Long id = 123L;
+        CustomerDTO customerDTO = new CustomerDTO("Art", "Shyshkin", "/api/v1/customers/" + id);
+
+        given(customerService.patchCustomer(anyLong(), any(CustomerDTO.class))).willAnswer((Answer<CustomerDTO>) invocation -> {
+            Long idPatch = invocation.getArgument(0, Long.class);
+            CustomerDTO patchDto = invocation.getArgument(1, CustomerDTO.class);
+            String firstName = patchDto.getFirstName();
+            String lastName = patchDto.getLastName();
+            return new CustomerDTO(
+                    firstName != null ? firstName : "Art",
+                    lastName != null ? lastName : "Shyshkin",
+                    "/api/v1/customers/" + idPatch
+            );
+        });
+
+        //when
+        mockMvc
+                .perform(
+                        patch("/api/v1/customers/{id}", id)
+                                .accept(APPLICATION_JSON)
+                                .contentType(APPLICATION_JSON)
+                                .content("{\"firstname\":\"ArtNew\"}"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(APPLICATION_JSON))
+                .andExpect(jsonPath("$.firstname", equalTo("ArtNew")))
+                .andExpect(jsonPath("$.lastname", equalTo("Shyshkin")))
+                .andExpect(jsonPath("$.customer_url", equalTo("/api/v1/customers/" + id)));
+
+        //then
+        then(customerService).should().patchCustomer(eq(id), customerDTOCaptor.capture());
+        CustomerDTO customerDTOToPatch = customerDTOCaptor.getValue();
+        assertThat(customerDTOToPatch.getFirstName()).isEqualTo("ArtNew");
+    }
+
+    @Test
+    void patchCustomer_simple() throws Exception {
+        //given
+        Long id = 123L;
+        CustomerDTO customerDTO = new CustomerDTO("Art", "Shyshkin", "/api/v1/customers/" + id);
+
+        given(customerService.patchCustomer(anyLong(), any(CustomerDTO.class))).willAnswer((Answer<CustomerDTO>) invocation -> {
+            String firstName = invocation.getArgument(1, CustomerDTO.class).getFirstName();
+            customerDTO.setFirstName(firstName);
+            return customerDTO;
+        });
+
+        //when
+        mockMvc
+                .perform(
+                        patch("/api/v1/customers/{id}", id)
+                                .accept(APPLICATION_JSON)
+                                .contentType(APPLICATION_JSON)
+                                .content("{\"firstname\":\"ArtNew\"}"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(APPLICATION_JSON))
+                .andExpect(jsonPath("$.firstname", equalTo("ArtNew")))
+                .andExpect(jsonPath("$.lastname", equalTo("Shyshkin")))
+                .andExpect(jsonPath("$.customer_url", equalTo("/api/v1/customers/" + id)));
+
+        //then
+        then(customerService).should().patchCustomer(eq(id), customerDTOCaptor.capture());
+        CustomerDTO customerDTOToPatch = customerDTOCaptor.getValue();
+        assertThat(customerDTOToPatch.getFirstName()).isEqualTo("ArtNew");
+    }
+
+
 }
