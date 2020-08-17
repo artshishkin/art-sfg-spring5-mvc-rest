@@ -9,6 +9,8 @@ import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -23,14 +25,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(CustomerController.class)
@@ -47,6 +49,9 @@ class CustomerControllerTest {
 
     @Value("classpath:/examples/customers.json")
     Resource resource;
+
+    @Captor
+    ArgumentCaptor<CustomerDTO> customerDTOCaptor;
 
     @Test
     void getAllCustomers_usingFakeImplementation() throws Exception {
@@ -158,4 +163,27 @@ class CustomerControllerTest {
         then(customerService).should().createNewCustomer(eq(dtoToSave));
     }
 
+    @Test
+    void updateCustomer() throws Exception {
+        //given
+        Long id = 123L;
+        CustomerDTO customerDTO = new CustomerDTO("Art", "Shyshkin", "/api/v1/customers/" + id);
+        given(customerService.updateCustomer(anyLong(), any(CustomerDTO.class))).willReturn(customerDTO);
+
+        //when
+        mockMvc
+                .perform(
+                        put("/api/v1/customers/{id}", id)
+                                .accept(APPLICATION_JSON)
+                                .contentType(APPLICATION_JSON)
+//                                .content(objectMapper.writeValueAsString(customerDTO)))
+                                .content("{\"firstname\":\"Art\",\"lastname\":\"Shyshkin\"}"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(APPLICATION_JSON))
+                .andExpect(content().json(objectMapper.writeValueAsString(customerDTO)));
+        //then
+        then(customerService).should().updateCustomer(eq(id), customerDTOCaptor.capture());
+        CustomerDTO customerDTOToSave = customerDTOCaptor.getValue();
+        assertThat(customerDTOToSave).isEqualToIgnoringGivenFields(customerDTO, "customerUrl");
+    }
 }

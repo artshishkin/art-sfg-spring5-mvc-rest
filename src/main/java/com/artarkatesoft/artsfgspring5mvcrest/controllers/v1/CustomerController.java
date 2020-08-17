@@ -36,4 +36,9 @@ public class CustomerController {
 //        URI locationUri = uriBuilder.build().toUri();
         return ResponseEntity.created(locationUri).body(newCustomer);
     }
+
+    @PutMapping("{id}")
+    public CustomerDTO updateCustomer(@PathVariable Long id, @RequestBody CustomerDTO customerDTO) {
+        return customerService.updateCustomer(id, customerDTO);
+    }
 }

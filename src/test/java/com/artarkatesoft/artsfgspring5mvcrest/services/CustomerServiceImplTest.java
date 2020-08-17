@@ -9,6 +9,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -31,6 +33,9 @@ class CustomerServiceImplTest {
     @Mock
     CustomerRepository customerRepository;
     private CustomerService customerService;
+
+    @Captor
+    ArgumentCaptor<Customer> customerCaptor;
 
     @BeforeEach
     void setUp() {
@@ -126,5 +131,59 @@ class CustomerServiceImplTest {
                 () -> assertThat(savedDto.getCustomerUrl())
                         .isEqualTo("/api/v1/customers/" + id)
         );
+    }
+
+    @Test
+    void updateCustomer_whenPresent() {
+        //given
+        Long id = 123L;
+        String firstName = "First";
+        String lastName = "Last";
+
+        String previousFirstName = "FirstOld";
+        String previousLastName = "LastOld";
+        CustomerDTO dtoToUpdate = new CustomerDTO(firstName, lastName, null);
+        Customer repoCustomer = new Customer(id, previousFirstName, previousLastName);
+        given(customerRepository.findById(anyLong())).willReturn(Optional.of(repoCustomer));
+        given(customerRepository.save(any(Customer.class)))
+                .willAnswer(answer -> {
+                    Customer customer = answer.getArgument(0, Customer.class);
+                    customer.setId(id);
+                    return customer;
+                });
+
+        //when
+        CustomerDTO updatedDto = customerService.updateCustomer(id, dtoToUpdate);
+
+        //then
+        then(customerRepository).should().findById(eq(id));
+        then(customerRepository).should().save(customerCaptor.capture());
+        Customer customerSave = customerCaptor.getValue();
+        assertAll(
+                () -> assertThat(customerSave.getId()).isEqualTo(id),
+                () -> assertThat(customerSave.getFirstName()).isEqualTo(firstName),
+                () -> assertThat(customerSave.getLastName()).isEqualTo(lastName),
+                () -> assertThat(updatedDto).isEqualToIgnoringNullFields(dtoToUpdate),
+                () -> assertThat(updatedDto.getCustomerUrl())
+                        .isEqualTo("/api/v1/customers/" + id)
+        );
+    }
+
+    @Test
+    void updateCustomer_whenAbsent() {
+        //given
+        Long id = 123L;
+        String firstName = "First";
+        String lastName = "Last";
+
+        CustomerDTO dtoToUpdate = new CustomerDTO(firstName, lastName, null);
+        given(customerRepository.findById(anyLong())).willReturn(Optional.empty());
+
+        //when
+        Executable whenUpdating = () -> customerService.updateCustomer(id, dtoToUpdate);
+
+        //then
+        assertThrows(RuntimeException.class, whenUpdating);
+        then(customerRepository).should().findById(eq(id));
     }
 }
