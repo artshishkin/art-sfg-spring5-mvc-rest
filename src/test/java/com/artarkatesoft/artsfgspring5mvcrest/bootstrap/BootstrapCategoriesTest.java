@@ -8,24 +8,23 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.atLeast;
 
 @ExtendWith(MockitoExtension.class)
-class BootstrapDataTest {
+class BootstrapCategoriesTest {
 
     @Mock
     CategoryRepository categoryRepository;
 
     @InjectMocks
-    BootstrapData bootstrapData;
+    BootstrapCategories bootstrapCategories;
 
     @Test
     void testBootstrapData() throws Exception {
         //when
-        bootstrapData.run();
+        bootstrapCategories.run();
         //then
         then(categoryRepository).should(atLeast(3)).save(any(Category.class));
     }

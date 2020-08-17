@@ -21,4 +21,8 @@ public class Vendor {
     private Long id;
 
     private String name;
+
+    public Vendor(String name) {
+        this.name = name;
+    }
 }

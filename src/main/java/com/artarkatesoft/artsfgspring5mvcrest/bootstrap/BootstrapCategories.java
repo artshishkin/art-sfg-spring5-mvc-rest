@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 
 @Component
 @RequiredArgsConstructor
-public class BootstrapData implements CommandLineRunner {
+public class BootstrapCategories implements CommandLineRunner {
 
     private final CategoryRepository categoryRepository;
 
