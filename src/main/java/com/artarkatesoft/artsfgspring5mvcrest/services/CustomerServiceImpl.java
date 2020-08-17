@@ -45,7 +45,7 @@ public class CustomerServiceImpl implements CustomerService {
     private Customer getCustomerFromRepo(Long id) {
         return customerRepository
                 .findById(id)
-                .orElseThrow(() -> new RuntimeException("Customer with id " + id + " not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Customer with id `" + id + "` not found"));
     }
 
     @Override
@@ -74,16 +74,12 @@ public class CustomerServiceImpl implements CustomerService {
     public CustomerDTO patchCustomer(Long id, CustomerDTO customerDTO) {
         Customer customer;
         Assert.notNull(customerDTO, "Customer must not be null");
-        try {
-            customer = getCustomerFromRepo(id);
-            String firstName = customerDTO.getFirstName();
-            if (firstName != null) customer.setFirstName(firstName);
-            String lastName = customerDTO.getLastName();
-            if (lastName != null) customer.setLastName(lastName);
-            return saveAndReturnDTO(customer);
-        } catch (RuntimeException e) {
-            throw new EntityNotFoundException("Customer with id `" + id + "` not found");
-        }
+        customer = getCustomerFromRepo(id);
+        String firstName = customerDTO.getFirstName();
+        if (firstName != null) customer.setFirstName(firstName);
+        String lastName = customerDTO.getLastName();
+        if (lastName != null) customer.setLastName(lastName);
+        return saveAndReturnDTO(customer);
     }
 
     @Override

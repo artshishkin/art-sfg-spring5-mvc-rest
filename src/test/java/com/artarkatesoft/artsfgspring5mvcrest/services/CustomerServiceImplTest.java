@@ -107,7 +107,7 @@ class CustomerServiceImplTest {
         };
 
         //then
-        assertThrows(RuntimeException.class, executable);
+        assertThrows(EntityNotFoundException.class, executable);
         then(customerRepository).should().findById(eq(id));
     }
 
@@ -187,7 +187,7 @@ class CustomerServiceImplTest {
         Executable whenUpdating = () -> customerService.updateCustomer(id, dtoToUpdate);
 
         //then
-        assertThrows(RuntimeException.class, whenUpdating);
+        assertThrows(EntityNotFoundException.class, whenUpdating);
         then(customerRepository).should().findById(eq(id));
     }
 

@@ -21,6 +21,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
 
+import javax.persistence.EntityNotFoundException;
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -133,6 +134,20 @@ class CustomerControllerTest {
                 .andExpect(jsonPath("$.firstname", equalTo(firstName)))
                 .andExpect(jsonPath("$.lastname", equalTo(lastName)))
                 .andExpect(jsonPath("$.customer_url", equalTo(BASE_URL + "/" + id)));
+        //then
+        then(customerService).should().getCustomerById(eq(id));
+    }
+
+    @Test
+    void getCustomerById_notFound() throws Exception {
+        //given
+        Long id = 123L;
+        given(customerService.getCustomerById(anyLong())).willThrow(new EntityNotFoundException("Customer with id `" + id + "` not found"));
+
+        //when
+        mockMvc.perform(get(BASE_URL + "/{id}", id).accept(APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(content().string("Customer with id `" + id + "` not found"));
         //then
         then(customerService).should().getCustomerById(eq(id));
     }

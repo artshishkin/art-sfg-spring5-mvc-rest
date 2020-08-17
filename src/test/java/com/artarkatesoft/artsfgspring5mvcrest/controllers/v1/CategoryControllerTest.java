@@ -1,6 +1,7 @@
 package com.artarkatesoft.artsfgspring5mvcrest.controllers.v1;
 
 import com.artarkatesoft.artsfgspring5mvcrest.api.v1.model.CategoryDTO;
+import com.artarkatesoft.artsfgspring5mvcrest.exceptions.RestResponseEntityExceptionHandler;
 import com.artarkatesoft.artsfgspring5mvcrest.services.CategoryService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,6 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -39,7 +41,10 @@ class CategoryControllerTest {
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(categoryController).build();
+        mockMvc = MockMvcBuilders
+                .standaloneSetup(categoryController)
+                .setControllerAdvice(new RestResponseEntityExceptionHandler())
+                .build();
 
         defaultCategoryDTOList = Arrays.asList(
                 new CategoryDTO(1L, "First"),
@@ -66,7 +71,7 @@ class CategoryControllerTest {
     }
 
     @Test
-    void getCategoryByName() throws Exception {
+    void getCategoryByName_whenPresent() throws Exception {
         //given
         CategoryDTO defaultCategoryDTO = defaultCategoryDTOList.get(0);
         final Long ID = defaultCategoryDTO.getId();
@@ -84,6 +89,23 @@ class CategoryControllerTest {
 
         //then
         then(categoryService).should().getCategoryByName(eq(NAME));
+    }
+
+    @Test
+    void getCategoryByName_whenAbsent() throws Exception {
+        //given
+        final String CATEGORY_NAME = "CategoryNotPresent";
+
+        given(categoryService.getCategoryByName(anyString()))
+                .willThrow(new EntityNotFoundException("Category with name `" + CATEGORY_NAME + "` not found"));
+
+        //when
+        mockMvc.perform(get(BASE_URL + "/{name}", CATEGORY_NAME).contentType(APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(content().string("Category with name `" + CATEGORY_NAME + "` not found"));
+
+        //then
+        then(categoryService).should().getCategoryByName(eq(CATEGORY_NAME));
     }
 
 

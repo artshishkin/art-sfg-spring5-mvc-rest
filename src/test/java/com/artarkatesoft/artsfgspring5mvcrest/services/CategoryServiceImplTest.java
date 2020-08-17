@@ -8,16 +8,18 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
@@ -54,12 +56,12 @@ class CategoryServiceImplTest {
     }
 
     @Test
-    void getCategoryByName() {
+    void getCategoryByName_whenPresent() {
         //given
         String CATEGORY_NAME = "Nuts";
         long ID = 123L;
         Category defaultCategory = new Category(ID, CATEGORY_NAME);
-        given(categoryRepository.findByName(anyString())).willReturn(defaultCategory);
+        given(categoryRepository.findByName(anyString())).willReturn(Optional.of(defaultCategory));
         //when
         CategoryDTO categoryByName = categoryService.getCategoryByName(CATEGORY_NAME);
         //then
@@ -68,6 +70,22 @@ class CategoryServiceImplTest {
                 () -> assertThat(categoryByName.getId()).isNotNull().isEqualTo(ID),
                 () -> assertThat(categoryByName.getName()).isNotNull().isEqualTo(CATEGORY_NAME)
         );
+
+    }
+
+    @Test
+    void getCategoryByName_whenAbsent() {
+        //given
+        String CATEGORY_NAME = "Nuts";
+        long ID = 123L;
+        given(categoryRepository.findByName(anyString())).willReturn(Optional.empty());
+        //when
+        assertThatThrownBy(() -> categoryService.getCategoryByName(CATEGORY_NAME))
+                //then
+                .isExactlyInstanceOf(EntityNotFoundException.class)
+                .hasMessage("Category with name `" + CATEGORY_NAME + "` not found");
+        then(categoryRepository).should().findByName(eq(CATEGORY_NAME));
+
 
     }
 }
