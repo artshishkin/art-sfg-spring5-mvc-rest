@@ -6,7 +6,9 @@ import com.artarkatesoft.artsfgspring5mvcrest.domain.Customer;
 import com.artarkatesoft.artsfgspring5mvcrest.repositories.CustomerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -64,5 +66,21 @@ public class CustomerServiceImpl implements CustomerService {
         customer = customerMapper.customerDTOToCustomer(customerDTO);
         customer.setId(id);
         return saveAndReturnDTO(customer);
+    }
+
+    @Override
+    public CustomerDTO patchCustomer(Long id, CustomerDTO customerDTO) {
+        Customer customer;
+        Assert.notNull(customerDTO, "Customer must not be null");
+        try {
+            customer = getCustomerFromRepo(id);
+            String firstName = customerDTO.getFirstName();
+            if (firstName != null) customer.setFirstName(firstName);
+            String lastName = customerDTO.getLastName();
+            if (lastName != null) customer.setLastName(lastName);
+            return saveAndReturnDTO(customer);
+        } catch (RuntimeException e) {
+            throw new EntityNotFoundException("Customer with id `" + id + "` not found");
+        }
     }
 }
