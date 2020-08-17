@@ -1,0 +1,33 @@
+{
+  "meta": {
+    "count": 6,
+    "limit": 10,
+    "page": 1
+  },
+  "vendors": [
+    {
+      "name": "Western Tasty Fruits Ltd.",
+      "vendor_url": "/shop/vendors/672"
+    },
+    {
+      "name": "Exotic Fruits Company",
+      "vendor_url": "/shop/vendors/32"
+    },
+    {
+      "name": "Home Fruits",
+      "vendor_url": "/shop/vendors/501"
+    },
+    {
+      "name": "Fun Fresh Fruits Ltd.",
+      "vendor_url": "/shop/vendors/810"
+    },
+    {
+      "name": "Nuts for Nuts Company",
+      "vendor_url": "/shop/vendors/67"
+    },
+    {
+      "name": "Franks Fresh Fruits from France Ltd.",
+      "vendor_url": "/shop/vendors/811"
+    }
+  ]
+}
