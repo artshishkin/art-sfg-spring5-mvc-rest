@@ -12,6 +12,8 @@ import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.artarkatesoft.artsfgspring5mvcrest.controllers.v1.CustomerController.BASE_URL;
+
 @Service
 @RequiredArgsConstructor
 public class CustomerServiceImpl implements CustomerService {
@@ -25,7 +27,7 @@ public class CustomerServiceImpl implements CustomerService {
                 .map(customer -> {
                     CustomerDTO dto = customerMapper.customerToCustomerDTO(customer);
                     Long id = customer.getId();
-                    dto.setCustomerUrl("/api/v1/customers/" + id);
+                    dto.setCustomerUrl(BASE_URL + "/" + id);
                     return dto;
                 })
                 .collect(Collectors.toList());
@@ -36,7 +38,7 @@ public class CustomerServiceImpl implements CustomerService {
         Customer customer = getCustomerFromRepo(id);
         CustomerDTO dto = customerMapper
                 .customerToCustomerDTO(customer);
-        dto.setCustomerUrl("/api/v1/customers/" + id);
+        dto.setCustomerUrl(BASE_URL + "/" + id);
         return dto;
     }
 
@@ -56,7 +58,7 @@ public class CustomerServiceImpl implements CustomerService {
         Customer savedCustomer = customerRepository.save(customer);
         Long savedId = savedCustomer.getId();
         CustomerDTO savedDto = customerMapper.customerToCustomerDTO(savedCustomer);
-        savedDto.setCustomerUrl("/api/v1/customers/" + savedId);
+        savedDto.setCustomerUrl(BASE_URL + "/" + savedId);
         return savedDto;
     }
 

@@ -13,6 +13,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import javax.persistence.EntityNotFoundException;
 import java.util.stream.LongStream;
 
+import static com.artarkatesoft.artsfgspring5mvcrest.controllers.v1.CustomerController.BASE_URL;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -47,7 +48,7 @@ class CustomerServiceImplIT {
         //then
         assertThat(customerDTOpatcher.getFirstName()).isEqualTo(firstName);
         assertThat(customerDTOpatcher.getLastName()).isNotEmpty();
-        assertThat(customerDTOpatcher.getCustomerUrl()).isEqualTo("/api/v1/customers/" + id);
+        assertThat(customerDTOpatcher.getCustomerUrl()).isEqualTo(BASE_URL + "/" + id);
     }
 
     @Test
@@ -61,13 +62,13 @@ class CustomerServiceImplIT {
         //then
         assertThat(customerDTOpatcher.getFirstName()).isNotEmpty();
         assertThat(customerDTOpatcher.getLastName()).isEqualTo(lastName);
-        assertThat(customerDTOpatcher.getCustomerUrl()).isEqualTo("/api/v1/customers/" + id);
+        assertThat(customerDTOpatcher.getCustomerUrl()).isEqualTo(BASE_URL + "/" + id);
     }
 
     @Test
     void patchCustomer_whenAbsent() {
         //given
-        Long idAbsent=123L;
+        Long idAbsent = 123L;
         String firstName = "First" + idAbsent + "Absent";
         String lastName = "Last" + idAbsent + "Absent";
         CustomerDTO customerDTO = new CustomerDTO(firstName, lastName, null);

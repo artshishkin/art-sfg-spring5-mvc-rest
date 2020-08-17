@@ -8,29 +8,22 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.ResultMatcher;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.Arrays;
 import java.util.List;
 
+import static com.artarkatesoft.artsfgspring5mvcrest.controllers.v1.CategoryController.BASE_URL;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
-import static org.springframework.http.HttpHeaders.*;
-import static org.springframework.http.MediaType.*;
-import static org.springframework.test.web.servlet.ResultMatcher.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.servlet.ResultMatcher.matchAll;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -61,7 +54,7 @@ class CategoryControllerTest {
         int defaultSize = defaultCategoryDTOList.size();
 
         //when
-        mockMvc.perform(get("/api/v1/categories").contentType(APPLICATION_JSON))
+        mockMvc.perform(get(BASE_URL).contentType(APPLICATION_JSON))
                 .andExpect(matchAll(
                         status().isOk(),
                         content().contentType(APPLICATION_JSON))
@@ -82,7 +75,7 @@ class CategoryControllerTest {
         given(categoryService.getCategoryByName(anyString())).willReturn(defaultCategoryDTO);
 
         //when
-        mockMvc.perform(get("/api/v1/categories/{name}", NAME).contentType(APPLICATION_JSON))
+        mockMvc.perform(get(BASE_URL + "/{name}", NAME).contentType(APPLICATION_JSON))
                 .andExpect(matchAll(
                         status().isOk(),
                         content().contentType(APPLICATION_JSON))

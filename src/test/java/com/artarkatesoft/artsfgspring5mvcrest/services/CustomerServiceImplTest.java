@@ -21,6 +21,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 
+import static com.artarkatesoft.artsfgspring5mvcrest.controllers.v1.CustomerController.BASE_URL;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.ThrowableAssert.ThrowingCallable;
@@ -71,7 +72,7 @@ class CustomerServiceImplTest {
         //then
         assertThat(allCustomersDTO).hasSize(3).allSatisfy(dto -> assertAll(
                 () -> assertThat(dto).hasNoNullFieldsOrProperties(),
-                () -> assertThat(dto.getCustomerUrl()).contains("/api/v1/customers/")
+                () -> assertThat(dto.getCustomerUrl()).contains(BASE_URL)
         ));
         then(customerRepository).should().findAll();
     }
@@ -132,7 +133,7 @@ class CustomerServiceImplTest {
         assertAll(
                 () -> assertThat(savedDto).isEqualToIgnoringNullFields(dtoToSave),
                 () -> assertThat(savedDto.getCustomerUrl())
-                        .isEqualTo("/api/v1/customers/" + id)
+                        .isEqualTo(BASE_URL + "/" + id)
         );
     }
 
@@ -168,7 +169,7 @@ class CustomerServiceImplTest {
                 () -> assertThat(customerSave.getLastName()).isEqualTo(lastName),
                 () -> assertThat(updatedDto).isEqualToIgnoringNullFields(dtoToUpdate),
                 () -> assertThat(updatedDto.getCustomerUrl())
-                        .isEqualTo("/api/v1/customers/" + id)
+                        .isEqualTo(BASE_URL + "/" + id)
         );
     }
 

@@ -12,8 +12,10 @@ import java.net.URI;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/v1/customers")
+@RequestMapping(CustomerController.BASE_URL)
 public class CustomerController {
+
+    public final static String BASE_URL =  "/api/v1/customers";
 
     private final CustomerService customerService;
 
