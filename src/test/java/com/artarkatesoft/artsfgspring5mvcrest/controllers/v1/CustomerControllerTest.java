@@ -256,5 +256,17 @@ class CustomerControllerTest {
         assertThat(customerDTOToPatch.getFirstName()).isEqualTo("ArtNew");
     }
 
+    @Test
+    void deleteCustomer() throws Exception {
+        //given
+        Long id = 123L;
+        //when
+        mockMvc.perform(delete("/api/v1/customers/{id}", id))
+                .andExpect(status().isOk())
+                .andExpect(content().string(""));
 
+        //then
+        then(customerService).should().deleteCustomer(eq(id));
+        then(customerService).shouldHaveNoMoreInteractions();
+    }
 }

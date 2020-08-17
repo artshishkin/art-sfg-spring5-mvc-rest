@@ -14,6 +14,7 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -21,6 +22,8 @@ import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.*;
@@ -185,5 +188,35 @@ class CustomerServiceImplTest {
         //then
         assertThrows(RuntimeException.class, whenUpdating);
         then(customerRepository).should().findById(eq(id));
+    }
+
+    @Test
+    void testDeleteCustomer_whenPresent() {
+        //given
+        Long id = 123L;
+        String firstName = "First";
+        String lastName = "Last";
+        Customer customer = new Customer(id, firstName, lastName);
+        given(customerRepository.findById(anyLong())).willReturn(Optional.of(customer));
+        //when
+        customerService.deleteCustomer(id);
+        //then
+        then(customerRepository).should().findById(eq(id));
+        then(customerRepository).should().delete(eq(customer));
+    }
+
+    @Test
+    void testDeleteCustomer_whenAbsent() {
+        //given
+        Long id = 123L;
+        given(customerRepository.findById(anyLong())).willReturn(Optional.empty());
+        //when
+        ThrowingCallable deleteOperation = () -> customerService.deleteCustomer(id);
+        //then
+        assertThatThrownBy(deleteOperation)
+                .isExactlyInstanceOf(EntityNotFoundException.class)
+                .hasMessage("Customer with id `" + id + "` not found");
+        then(customerRepository).should().findById(eq(id));
+        then(customerRepository).shouldHaveNoMoreInteractions();
     }
 }

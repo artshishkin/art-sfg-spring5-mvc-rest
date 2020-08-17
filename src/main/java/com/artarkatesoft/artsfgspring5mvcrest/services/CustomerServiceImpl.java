@@ -83,4 +83,12 @@ public class CustomerServiceImpl implements CustomerService {
             throw new EntityNotFoundException("Customer with id `" + id + "` not found");
         }
     }
+
+    @Override
+    public void deleteCustomer(Long id) {
+        Customer customer = customerRepository
+                .findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Customer with id `" + id + "` not found"));
+        customerRepository.delete(customer);
+    }
 }
