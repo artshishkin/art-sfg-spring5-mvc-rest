@@ -10,3 +10,9 @@ SFG Tutorial Spring 5 - Section 24 Restful WebServices with Spring MVC
 1.  visit `editor.swagger.io`
 2.  copy from json code from your project `localhost:8080/v2/api-docs`
 3.  paste it in `editor.swagger.io`, modify 
+
+####  Swagger Code Generator (404)
+
+1.  go to swagger editor site
+2.  `Generate Server`
+3.  download code to review `skeleton`
