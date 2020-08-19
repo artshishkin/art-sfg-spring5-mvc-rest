@@ -4,3 +4,9 @@
 SFG Tutorial Spring 5 - Section 24 Restful WebServices with Spring MVC
 
 ### We are cloning `https://api.predic8.de/shop/docs#!/ `
+
+####  Introduction to Swagger Editor (403)
+
+1.  visit `editor.swagger.io`
+2.  copy from json code from your project `localhost:8080/v2/api-docs`
+3.  paste it in `editor.swagger.io`, modify 
