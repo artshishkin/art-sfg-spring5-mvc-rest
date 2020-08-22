@@ -16,3 +16,9 @@ SFG Tutorial Spring 5 - Section 24 Restful WebServices with Spring MVC
 1.  go to swagger editor site
 2.  `Generate Server`
 3.  download code to review `skeleton`
+
+####  Spring MVC Content Negotiation Overview (427)
+
+1.  `ContentNegotiatingViewResolver`
+2.  `View`
+3.  `MappingJackson2JsonView`
