@@ -23,7 +23,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.http.MediaType.*;
 import static org.springframework.test.web.servlet.ResultMatcher.matchAll;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -53,13 +53,13 @@ class CategoryControllerTest {
     }
 
     @Test
-    void getAllCategories() throws Exception {
+    void getAllCategories_json() throws Exception {
         //given
         given(categoryService.getAllCategories()).willReturn(defaultCategoryDTOList);
         int defaultSize = defaultCategoryDTOList.size();
 
         //when
-        mockMvc.perform(get(BASE_URL).contentType(APPLICATION_JSON))
+        mockMvc.perform(get(BASE_URL).accept(APPLICATION_JSON))
                 .andExpect(matchAll(
                         status().isOk(),
                         content().contentType(APPLICATION_JSON))
@@ -71,7 +71,25 @@ class CategoryControllerTest {
     }
 
     @Test
-    void getCategoryByName_whenPresent() throws Exception {
+    void getAllCategories_xml() throws Exception {
+        //given
+        given(categoryService.getAllCategories()).willReturn(defaultCategoryDTOList);
+        int defaultSize = defaultCategoryDTOList.size();
+
+        //when
+        mockMvc.perform(get(BASE_URL).accept(APPLICATION_XML))
+                .andExpect(matchAll(
+                        status().isOk(),
+                        content().contentType(APPLICATION_XML_VALUE + ";charset=UTF-8"))
+                )
+                .andExpect(xpath("//categories//categories").nodeCount(defaultSize));
+
+        //then
+        then(categoryService).should().getAllCategories();
+    }
+
+    @Test
+    void getCategoryByName_whenPresent_json() throws Exception {
         //given
         CategoryDTO defaultCategoryDTO = defaultCategoryDTOList.get(0);
         final Long ID = defaultCategoryDTO.getId();
@@ -80,12 +98,33 @@ class CategoryControllerTest {
         given(categoryService.getCategoryByName(anyString())).willReturn(defaultCategoryDTO);
 
         //when
-        mockMvc.perform(get(BASE_URL + "/{name}", NAME).contentType(APPLICATION_JSON))
+        mockMvc.perform(get(BASE_URL + "/{name}", NAME).accept(APPLICATION_JSON))
                 .andExpect(matchAll(
                         status().isOk(),
                         content().contentType(APPLICATION_JSON))
                 )
                 .andExpect(jsonPath("$.name", equalTo(NAME)));
+
+        //then
+        then(categoryService).should().getCategoryByName(eq(NAME));
+    }
+
+    @Test
+    void getCategoryByName_whenPresent_xml() throws Exception {
+        //given
+        CategoryDTO defaultCategoryDTO = defaultCategoryDTOList.get(0);
+        final Long ID = defaultCategoryDTO.getId();
+        final String NAME = defaultCategoryDTO.getName();
+
+        given(categoryService.getCategoryByName(anyString())).willReturn(defaultCategoryDTO);
+
+        //when
+        mockMvc.perform(get(BASE_URL + "/{name}", NAME).accept(APPLICATION_XML))
+                .andExpect(matchAll(
+                        status().isOk(),
+                        content().contentType(APPLICATION_XML_VALUE + ";charset=UTF-8"))
+                )
+                .andExpect(xpath("//name").string(NAME));
 
         //then
         then(categoryService).should().getCategoryByName(eq(NAME));
