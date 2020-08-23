@@ -1,8 +1,8 @@
 package com.artarkatesoft.artsfgspring5mvcrest.bootstrap;
 
 import com.artarkatesoft.artsfgspring5mvcrest.api.v1.mapper.CustomerMapper;
-import com.artarkatesoft.artsfgspring5mvcrest.api.v1.model.CustomerListDTO;
 import com.artarkatesoft.artsfgspring5mvcrest.repositories.CustomerRepository;
+import com.artarkatesoft.model.CustomerListDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;

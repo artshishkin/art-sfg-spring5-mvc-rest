@@ -1,9 +1,9 @@
 package com.artarkatesoft.artsfgspring5mvcrest.services;
 
 import com.artarkatesoft.artsfgspring5mvcrest.api.v1.mapper.CustomerMapper;
-import com.artarkatesoft.artsfgspring5mvcrest.api.v1.model.CustomerDTO;
 import com.artarkatesoft.artsfgspring5mvcrest.domain.Customer;
 import com.artarkatesoft.artsfgspring5mvcrest.repositories.CustomerRepository;
+import com.artarkatesoft.model.CustomerDTO;
 import org.assertj.core.api.ThrowableAssert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -42,7 +42,9 @@ class CustomerServiceImplIT {
         //given
         String firstName = "First" + id + "Updated";
         String lastName = null;
-        CustomerDTO customerDTO = new CustomerDTO(firstName, lastName, null);
+        CustomerDTO customerDTO = new CustomerDTO();
+        customerDTO.setFirstName(firstName);
+        customerDTO.setLastName(lastName);
         //when
         CustomerDTO customerDTOpatcher = customerService.patchCustomer(id, customerDTO);
         //then
@@ -56,7 +58,9 @@ class CustomerServiceImplIT {
         //given
         String firstName = null;
         String lastName = "Last" + id + "Updated";
-        CustomerDTO customerDTO = new CustomerDTO(firstName, lastName, null);
+        CustomerDTO customerDTO = new CustomerDTO();
+        customerDTO.setFirstName(firstName);
+        customerDTO.setLastName(lastName);
         //when
         CustomerDTO customerDTOpatcher = customerService.patchCustomer(id, customerDTO);
         //then
@@ -71,7 +75,9 @@ class CustomerServiceImplIT {
         Long idAbsent = 123L;
         String firstName = "First" + idAbsent + "Absent";
         String lastName = "Last" + idAbsent + "Absent";
-        CustomerDTO customerDTO = new CustomerDTO(firstName, lastName, null);
+        CustomerDTO customerDTO = new CustomerDTO();
+        customerDTO.setFirstName(firstName);
+        customerDTO.setLastName(lastName);
         //when
         ThrowableAssert.ThrowingCallable callPatch = () -> customerService.patchCustomer(idAbsent, customerDTO);
         //then

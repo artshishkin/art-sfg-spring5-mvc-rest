@@ -1,8 +1,8 @@
 package com.artarkatesoft.artsfgspring5mvcrest.repositories;
 
 import com.artarkatesoft.artsfgspring5mvcrest.api.v1.mapper.CustomerMapper;
-import com.artarkatesoft.artsfgspring5mvcrest.api.v1.model.CustomerListDTO;
 import com.artarkatesoft.artsfgspring5mvcrest.domain.Customer;
+import com.artarkatesoft.model.CustomerListDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;

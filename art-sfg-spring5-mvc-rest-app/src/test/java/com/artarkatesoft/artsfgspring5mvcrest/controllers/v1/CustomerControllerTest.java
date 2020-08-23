@@ -1,8 +1,8 @@
 package com.artarkatesoft.artsfgspring5mvcrest.controllers.v1;
 
-import com.artarkatesoft.artsfgspring5mvcrest.api.v1.model.CustomerDTO;
-import com.artarkatesoft.artsfgspring5mvcrest.api.v1.model.CustomerListDTO;
 import com.artarkatesoft.artsfgspring5mvcrest.services.CustomerService;
+import com.artarkatesoft.model.CustomerDTO;
+import com.artarkatesoft.model.CustomerListDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.Matchers;
@@ -74,7 +74,11 @@ class CustomerControllerTest {
     }
 
     private CustomerDTO createFakeCustomer(Long id) {
-        return new CustomerDTO("First" + id, "Last" + id, BASE_URL + "/" + id);
+        CustomerDTO customerDTO = new CustomerDTO();
+        customerDTO.setFirstName("First" + id);
+        customerDTO.setLastName("Last" + id);
+        customerDTO.setCustomerUrl(BASE_URL + "/" + id);
+        return customerDTO;
     }
 
     private List<CustomerDTO> getFakeCustomers(int size) {
@@ -156,8 +160,13 @@ class CustomerControllerTest {
     @ValueSource(strings = {BASE_URL, BASE_URL + "/"})
     void createNewCustomer(String urlToPostTo) throws Exception {
         //given
-        CustomerDTO dtoToSave = new CustomerDTO("first", "last", null);
-        CustomerDTO savedDto = new CustomerDTO("first", "last", BASE_URL + "/123");
+        CustomerDTO dtoToSave = new CustomerDTO();
+        dtoToSave.setFirstName("first");
+        dtoToSave.setLastName("last");
+        CustomerDTO savedDto = new CustomerDTO();
+        savedDto.setFirstName("first");
+        savedDto.setLastName("last");
+        savedDto.setCustomerUrl(BASE_URL + "/123");
         String dtoString = objectMapper.writeValueAsString(dtoToSave);
         given(customerService.createNewCustomer(any(CustomerDTO.class))).willReturn(savedDto);
         //when
@@ -170,7 +179,7 @@ class CustomerControllerTest {
                 .andExpect(ResultMatcher.matchAll(
                         status().isCreated(),
                         content().contentType(APPLICATION_JSON),
-                        header().string(HttpHeaders.LOCATION, Matchers.equalTo("http://localhost"+BASE_URL+"/123"))
+                        header().string(HttpHeaders.LOCATION, Matchers.equalTo("http://localhost" + BASE_URL + "/123"))
 
                 ))
                 .andExpect(jsonPath("$.firstname", equalTo("first")))
@@ -184,7 +193,10 @@ class CustomerControllerTest {
     void updateCustomer() throws Exception {
         //given
         Long id = 123L;
-        CustomerDTO customerDTO = new CustomerDTO("Art", "Shyshkin", BASE_URL + "/" + id);
+        CustomerDTO customerDTO = new CustomerDTO();
+        customerDTO.setFirstName("Art");
+        customerDTO.setLastName("Shyshkin");
+        customerDTO.setCustomerUrl(BASE_URL + "/" + id);
         given(customerService.updateCustomer(anyLong(), any(CustomerDTO.class))).willReturn(customerDTO);
 
         //when
@@ -208,18 +220,22 @@ class CustomerControllerTest {
     void patchCustomer() throws Exception {
         //given
         Long id = 123L;
-        CustomerDTO customerDTO = new CustomerDTO("Art", "Shyshkin", BASE_URL + "/" + id);
-
+        CustomerDTO customerDTO = new CustomerDTO();
+        customerDTO.setFirstName("Art");
+        customerDTO.setLastName("Shyshkin");
+        customerDTO.setCustomerUrl(BASE_URL + "/" + id);
         given(customerService.patchCustomer(anyLong(), any(CustomerDTO.class))).willAnswer((Answer<CustomerDTO>) invocation -> {
             Long idPatch = invocation.getArgument(0, Long.class);
             CustomerDTO patchDto = invocation.getArgument(1, CustomerDTO.class);
             String firstName = patchDto.getFirstName();
             String lastName = patchDto.getLastName();
-            return new CustomerDTO(
-                    firstName != null ? firstName : "Art",
-                    lastName != null ? lastName : "Shyshkin",
-                    BASE_URL + "/" + idPatch
-            );
+
+            CustomerDTO newCustomerDTO = new CustomerDTO();
+            newCustomerDTO.setFirstName(firstName != null ? firstName : "Art");
+            newCustomerDTO.setLastName(lastName != null ? lastName : "Shyshkin");
+            newCustomerDTO.setCustomerUrl(BASE_URL + "/" + idPatch);
+
+            return newCustomerDTO;
         });
 
         //when
@@ -245,7 +261,10 @@ class CustomerControllerTest {
     void patchCustomer_simple() throws Exception {
         //given
         Long id = 123L;
-        CustomerDTO customerDTO = new CustomerDTO("Art", "Shyshkin", BASE_URL + "/" + id);
+        CustomerDTO customerDTO = new CustomerDTO();
+        customerDTO.setFirstName("Art");
+        customerDTO.setLastName("Shyshkin");
+        customerDTO.setCustomerUrl(BASE_URL + "/" + id);
 
         given(customerService.patchCustomer(anyLong(), any(CustomerDTO.class))).willAnswer((Answer<CustomerDTO>) invocation -> {
             String firstName = invocation.getArgument(1, CustomerDTO.class).getFirstName();

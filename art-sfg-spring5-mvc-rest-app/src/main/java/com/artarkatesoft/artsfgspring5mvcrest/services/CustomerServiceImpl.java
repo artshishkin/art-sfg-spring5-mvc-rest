@@ -1,9 +1,9 @@
 package com.artarkatesoft.artsfgspring5mvcrest.services;
 
 import com.artarkatesoft.artsfgspring5mvcrest.api.v1.mapper.CustomerMapper;
-import com.artarkatesoft.artsfgspring5mvcrest.api.v1.model.CustomerDTO;
 import com.artarkatesoft.artsfgspring5mvcrest.domain.Customer;
 import com.artarkatesoft.artsfgspring5mvcrest.repositories.CustomerRepository;
+import com.artarkatesoft.model.CustomerDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;

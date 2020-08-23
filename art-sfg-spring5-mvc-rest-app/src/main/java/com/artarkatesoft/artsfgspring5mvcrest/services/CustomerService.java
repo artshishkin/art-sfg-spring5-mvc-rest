@@ -1,6 +1,7 @@
 package com.artarkatesoft.artsfgspring5mvcrest.services;
 
-import com.artarkatesoft.artsfgspring5mvcrest.api.v1.model.CustomerDTO;
+
+import com.artarkatesoft.model.CustomerDTO;
 
 import java.util.List;
 

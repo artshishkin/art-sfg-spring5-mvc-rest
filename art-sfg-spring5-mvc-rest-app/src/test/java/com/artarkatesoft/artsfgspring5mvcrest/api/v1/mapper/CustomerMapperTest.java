@@ -1,7 +1,7 @@
 package com.artarkatesoft.artsfgspring5mvcrest.api.v1.mapper;
 
-import com.artarkatesoft.artsfgspring5mvcrest.api.v1.model.CustomerDTO;
 import com.artarkatesoft.artsfgspring5mvcrest.domain.Customer;
+import com.artarkatesoft.model.CustomerDTO;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
@@ -42,7 +42,9 @@ class CustomerMapperTest {
     @Test
     void customerDTOToCustomer() {
         //given
-        CustomerDTO customerDTO = new CustomerDTO(FIRST_NAME, LAST_NAME, null);
+        CustomerDTO customerDTO = new CustomerDTO();
+        customerDTO.setFirstName(FIRST_NAME);
+        customerDTO.setLastName(LAST_NAME);
         //when
         Customer customer = customerMapper.customerDTOToCustomer(customerDTO);
         //then

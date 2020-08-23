@@ -1,8 +1,8 @@
 package com.artarkatesoft.artsfgspring5mvcrest.controllers.v1;
 
-import com.artarkatesoft.artsfgspring5mvcrest.api.v1.model.CustomerDTO;
-import com.artarkatesoft.artsfgspring5mvcrest.api.v1.model.CustomerListDTO;
 import com.artarkatesoft.artsfgspring5mvcrest.services.CustomerService;
+import com.artarkatesoft.model.CustomerDTO;
+import com.artarkatesoft.model.CustomerListDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.SwaggerDefinition;
@@ -30,7 +30,9 @@ public class CustomerController {
     @ApiOperation(value = "Retrieve all customers", notes = "This will show all the customers")
     @GetMapping
     public CustomerListDTO getAllCustomers() {
-        return new CustomerListDTO(customerService.getAllCustomers());
+        CustomerListDTO customerListDTO = new CustomerListDTO();
+        customerListDTO.getCustomers().addAll(customerService.getAllCustomers());
+        return customerListDTO;
     }
 
     @ApiOperation(value = "Retrieve customer by id", notes = "This will show one customer info")

@@ -1,9 +1,9 @@
 package com.artarkatesoft.artsfgspring5mvcrest.services;
 
 import com.artarkatesoft.artsfgspring5mvcrest.api.v1.mapper.CustomerMapper;
-import com.artarkatesoft.artsfgspring5mvcrest.api.v1.model.CustomerDTO;
 import com.artarkatesoft.artsfgspring5mvcrest.domain.Customer;
 import com.artarkatesoft.artsfgspring5mvcrest.repositories.CustomerRepository;
+import com.artarkatesoft.model.CustomerDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -117,7 +117,9 @@ class CustomerServiceImplTest {
         Long id = 123L;
         String firstName = "First";
         String lastName = "Last";
-        CustomerDTO dtoToSave = new CustomerDTO(firstName, lastName, null);
+        CustomerDTO dtoToSave = new CustomerDTO();
+        dtoToSave.setFirstName(firstName);
+        dtoToSave.setLastName(lastName);
         given(customerRepository.save(any(Customer.class)))
                 .willAnswer(answer -> {
                     Customer customer = answer.getArgument(0, Customer.class);
@@ -146,7 +148,9 @@ class CustomerServiceImplTest {
 
         String previousFirstName = "FirstOld";
         String previousLastName = "LastOld";
-        CustomerDTO dtoToUpdate = new CustomerDTO(firstName, lastName, null);
+        CustomerDTO dtoToUpdate = new CustomerDTO();
+        dtoToUpdate.setFirstName(firstName);
+        dtoToUpdate.setLastName(lastName);
         Customer repoCustomer = new Customer(id, previousFirstName, previousLastName);
         given(customerRepository.findById(anyLong())).willReturn(Optional.of(repoCustomer));
         given(customerRepository.save(any(Customer.class)))
@@ -180,7 +184,9 @@ class CustomerServiceImplTest {
         String firstName = "First";
         String lastName = "Last";
 
-        CustomerDTO dtoToUpdate = new CustomerDTO(firstName, lastName, null);
+        CustomerDTO dtoToUpdate = new CustomerDTO();
+        dtoToUpdate.setFirstName(firstName);
+        dtoToUpdate.setLastName(lastName);
         given(customerRepository.findById(anyLong())).willReturn(Optional.empty());
 
         //when
