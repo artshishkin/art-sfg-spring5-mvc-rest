@@ -1,5 +1,7 @@
 package com.artarkatesoft.artsfgspring5mvcrest.controllers.v1;
 
+import com.artarkatesoft.artsfgspring5mvcrest.api.v1.mapper.CustomerMapper;
+import com.artarkatesoft.artsfgspring5mvcrest.domain.CustomerList;
 import com.artarkatesoft.artsfgspring5mvcrest.services.CustomerService;
 import com.artarkatesoft.model.CustomerDTO;
 import com.artarkatesoft.model.CustomerListDTO;
@@ -105,20 +107,29 @@ class CustomerControllerTest {
                 .andExpect(content().contentType(APPLICATION_JSON))
                 .andExpect(content().json(jsonContent))
                 .andExpect(jsonPath("$.customers", hasSize(size)))
-                .andExpect(jsonPath("$.customers[1].customer_url", CoreMatchers.notNullValue()))
-                .andExpect(jsonPath("$.customers[0].firstname", equalTo(defaultCustomers.get(0).getFirstName())));
+                .andExpect(jsonPath("$.customers[1].customerUrl", CoreMatchers.notNullValue()))
+                .andExpect(jsonPath("$.customers[0].firstName", equalTo(defaultCustomers.get(0).getFirstName())));
         //then
         then(customerService).should().getAllCustomers();
     }
 
     private CustomerListDTO getExampleCustomers() throws IOException {
 //        ClassPathResource resource = new ClassPathResource("/examples/customers.json");
-        CustomerListDTO exampleCustomerListDTO = objectMapper.readValue(resource.getFile(), CustomerListDTO.class);
-        exampleCustomerListDTO
+        CustomerList exampleCustomerList = objectMapper.readValue(resource.getFile(), CustomerList.class);
+        CustomerMapper customerMapper = CustomerMapper.INSTANCE;
+
+        CustomerListDTO customerListDTO = new CustomerListDTO();
+        List<CustomerDTO> customerDTOs = exampleCustomerList
                 .getCustomers()
-                .forEach(dto ->
-                        dto.setCustomerUrl(dto.getCustomerUrl().replace("shop", "api/v1")));
-        return exampleCustomerListDTO;
+                .stream()
+                .map(customer -> {
+                    CustomerDTO dto = customerMapper.customerToCustomerDTO(customer);
+                    dto.setCustomerUrl("/api/v1/customers/" + customer.getId());
+                    return dto;
+                })
+                .collect(Collectors.toList());
+        customerListDTO.getCustomers().addAll(customerDTOs);
+        return customerListDTO;
     }
 
 
@@ -135,9 +146,9 @@ class CustomerControllerTest {
         mockMvc.perform(get(BASE_URL + "/{id}", id).accept(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(APPLICATION_JSON))
-                .andExpect(jsonPath("$.firstname", equalTo(firstName)))
-                .andExpect(jsonPath("$.lastname", equalTo(lastName)))
-                .andExpect(jsonPath("$.customer_url", equalTo(BASE_URL + "/" + id)));
+                .andExpect(jsonPath("$.firstName", equalTo(firstName)))
+                .andExpect(jsonPath("$.lastName", equalTo(lastName)))
+                .andExpect(jsonPath("$.customerUrl", equalTo(BASE_URL + "/" + id)));
         //then
         then(customerService).should().getCustomerById(eq(id));
     }
@@ -182,11 +193,12 @@ class CustomerControllerTest {
                         header().string(HttpHeaders.LOCATION, Matchers.equalTo("http://localhost" + BASE_URL + "/123"))
 
                 ))
-                .andExpect(jsonPath("$.firstname", equalTo("first")))
-                .andExpect(jsonPath("$.lastname", equalTo("last")))
-                .andExpect(jsonPath("$.customer_url", equalTo(BASE_URL + "/123")));
+                .andExpect(jsonPath("$.firstName", equalTo("first")))
+                .andExpect(jsonPath("$.lastName", equalTo("last")))
+                .andExpect(jsonPath("$.customerUrl", equalTo(BASE_URL + "/123")));
         //then
-        then(customerService).should().createNewCustomer(eq(dtoToSave));
+        then(customerService).should().createNewCustomer(customerDTOCaptor.capture());
+        assertThat(customerDTOCaptor.getValue()).isEqualToComparingFieldByField(dtoToSave);
     }
 
     @Test
@@ -206,7 +218,7 @@ class CustomerControllerTest {
                                 .accept(APPLICATION_JSON)
                                 .contentType(APPLICATION_JSON)
 //                                .content(objectMapper.writeValueAsString(customerDTO)))
-                                .content("{\"firstname\":\"Art\",\"lastname\":\"Shyshkin\"}"))
+                                .content("{\"firstName\":\"Art\",\"lastName\":\"Shyshkin\"}"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(APPLICATION_JSON))
                 .andExpect(content().json(objectMapper.writeValueAsString(customerDTO)));
@@ -244,12 +256,12 @@ class CustomerControllerTest {
                         patch(BASE_URL + "/{id}", id)
                                 .accept(APPLICATION_JSON)
                                 .contentType(APPLICATION_JSON)
-                                .content("{\"firstname\":\"ArtNew\"}"))
+                                .content("{\"firstName\":\"ArtNew\"}"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(APPLICATION_JSON))
-                .andExpect(jsonPath("$.firstname", equalTo("ArtNew")))
-                .andExpect(jsonPath("$.lastname", equalTo("Shyshkin")))
-                .andExpect(jsonPath("$.customer_url", equalTo(BASE_URL + "/" + id)));
+                .andExpect(jsonPath("$.firstName", equalTo("ArtNew")))
+                .andExpect(jsonPath("$.lastName", equalTo("Shyshkin")))
+                .andExpect(jsonPath("$.customerUrl", equalTo(BASE_URL + "/" + id)));
 
         //then
         then(customerService).should().patchCustomer(eq(id), customerDTOCaptor.capture());
@@ -278,12 +290,12 @@ class CustomerControllerTest {
                         patch(BASE_URL + "/{id}", id)
                                 .accept(APPLICATION_JSON)
                                 .contentType(APPLICATION_JSON)
-                                .content("{\"firstname\":\"ArtNew\"}"))
+                                .content("{\"firstName\":\"ArtNew\"}"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(APPLICATION_JSON))
-                .andExpect(jsonPath("$.firstname", equalTo("ArtNew")))
-                .andExpect(jsonPath("$.lastname", equalTo("Shyshkin")))
-                .andExpect(jsonPath("$.customer_url", equalTo(BASE_URL + "/" + id)));
+                .andExpect(jsonPath("$.firstName", equalTo("ArtNew")))
+                .andExpect(jsonPath("$.lastName", equalTo("Shyshkin")))
+                .andExpect(jsonPath("$.customerUrl", equalTo(BASE_URL + "/" + id)));
 
         //then
         then(customerService).should().patchCustomer(eq(id), customerDTOCaptor.capture());

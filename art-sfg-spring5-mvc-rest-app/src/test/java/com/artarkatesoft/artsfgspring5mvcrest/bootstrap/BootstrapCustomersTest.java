@@ -34,7 +34,7 @@ class BootstrapCustomersTest {
     void setUp() {
         ObjectMapper objectMapper = new ObjectMapper();
         CustomerMapper customerMapper = Mappers.getMapper(CustomerMapper.class);
-        bootstrapCustomers = new BootstrapCustomers(objectMapper, customerMapper, customerRepository);
+        bootstrapCustomers = new BootstrapCustomers(objectMapper, customerRepository);
     }
 
     @Test

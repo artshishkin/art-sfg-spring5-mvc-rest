@@ -1,13 +1,11 @@
 package com.artarkatesoft.artsfgspring5mvcrest.repositories;
 
-import com.artarkatesoft.artsfgspring5mvcrest.api.v1.mapper.CustomerMapper;
 import com.artarkatesoft.artsfgspring5mvcrest.domain.Customer;
-import com.artarkatesoft.model.CustomerListDTO;
+import com.artarkatesoft.artsfgspring5mvcrest.domain.CustomerList;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.core.io.ClassPathResource;
@@ -27,12 +25,10 @@ class CustomerRepositoryTest {
     CustomerRepository customerRepository;
 
     private static ObjectMapper objectMapper;
-    private static CustomerMapper customerMapper;
 
     @BeforeAll
     static void beforeAll() {
         objectMapper = new ObjectMapper();
-        customerMapper = Mappers.getMapper(CustomerMapper.class);
     }
 
     @BeforeEach
@@ -40,11 +36,8 @@ class CustomerRepositoryTest {
         customerRepository.deleteAll();
 
         ClassPathResource resource = new ClassPathResource("/examples/customers.json");
-        CustomerListDTO customerListDTO = objectMapper.readValue(resource.getFile(), CustomerListDTO.class);
-        customerListDTO
-                .getCustomers()
-                .stream()
-                .map(customerMapper::customerDTOToCustomer)
+        CustomerList customerList = objectMapper.readValue(resource.getFile(), CustomerList.class);
+        customerList.getCustomers()
                 .forEach(customerRepository::save);
     }
 
